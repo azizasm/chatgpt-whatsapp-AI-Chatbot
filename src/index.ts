@@ -1,4 +1,4 @@
-// cd 
+// cd C:\Users\E\chatgptc\whatsapp-chatgpt-master
 //  npm run start
 // 
 
@@ -7,6 +7,11 @@ const qrcode = require("qrcode-terminal");
 // const { Client } = require("whatsapp-web.js");
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const { Message, ClientInfo, Buttons } = require('whatsapp-web.js/src/structures');
+
+
+const operandClient = require("@operandinc/sdk").operandClient;
+const indexIDHeaderKey = require("@operandinc/sdk").indexIDHeaderKey;
+const ObjectService = require("@operandinc/sdk").ObjectService;
 
 import { ChatGPTAPI } from 'chatgpt'
 
@@ -105,6 +110,10 @@ const start = async () => {
         if (message.body.length == 0) return
         if (message.from == "status@broadcast") return
 		
+
+
+
+         
 		
 
         if (prefixEnabled) {
@@ -112,6 +121,7 @@ const start = async () => {
                 // Get the rest of the message
                 const prompt = message.body.substring(prefix.length + 1);
                 //const prompt = message.body.substring(prefix.length );
+                
                 await handleMessage(message, prompt)
             }
         } else {
@@ -122,6 +132,32 @@ const start = async () => {
     client.initialize()
 }
 
+const runIndex = async (message: any) => {
+    const operand = operandClient(
+      ObjectService,
+      process.env.OPERAND_KEY,
+      "https://api.operand.ai",
+      {
+        [indexIDHeaderKey]: process.env.OPERAND_INDEX_KEY,
+      }
+    );
+
+    try {
+      const results = await operand.searchWithin({
+        query: `${message}`,
+        limit: 1,
+      });
+
+      if (results) {
+        return results.matches.map((m) => `- ${m.content}`).join("\n");
+      } else {
+        return "";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 const handleMessage = async (message: any, prompt: any) => {
     try {
         const start = Date.now()
@@ -131,7 +167,9 @@ const handleMessage = async (message: any, prompt: any) => {
 		const  tmp  = prompt ; 
 		//prompt = " " + tmp;
 
-        prompt = process.env.GPT_PROMPTS_CUSTOMER_SUPPORT01  + tmp;
+        let operandSearch = await runIndex(prompt);
+
+        prompt = process.env.GPT_PROMPTS_CUSTOMER_SUPPORT02 + `\n${operandSearch}.\n Here my question is :` + tmp;
 		//console.log("[ChatGPT] full msg before send:  " + prompt )
 
         if (message.body.startsWith("!gpt")) {
