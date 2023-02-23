@@ -40,7 +40,20 @@ test the chat functionality by send Whatsapp message to registered number :
 example : 
 |ChatGPT AI Chatbot             | Customer                    |
 |-------------------------------|-----------------------------|
-|                               |`!cimb how to apply credit card `       |
+|                               |`!cimb Hi I have problem on activating account. Problem related .. `       |
 |`Reply from ChatGPT AI Chatbot .... `            |      |
 
 
+# Sequence Diagram of ChatGPT AI Chatbot
+
+```mermaid
+sequenceDiagram
+    Customer ->> BackEnd: Send WhatsApp message : E.g : Hi I have problem on activating account. Problem ..
+    BackEnd-->>Operand: Find Knowledge Graph on customer question 
+    Operand-->>BackEnd: Return Knowledge Graph on account activation
+    BackEnd->>ChatGPT: Knowledge Graph + customer question
+    ChatGPT-->>BackEnd: Return Answer to question
+    BackEnd-->>Customer: Reply WhatsApp question with ChatGPT Answer
+
+
+```
