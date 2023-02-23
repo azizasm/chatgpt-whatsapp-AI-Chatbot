@@ -48,7 +48,8 @@ example :
 
 ```mermaid
 sequenceDiagram
-    Customer ->> BackEnd: Send WhatsApp message : E.g : Hi I have problem on activating account. Problem ..
+    Note over Customer,BackEnd: Communication over WhatsApp
+    Customer ->> BackEnd: Customer inquiry message : E.g : Hi I have problem on activating account. Problem ..
     BackEnd-->>Operand: Find Knowledge Graph on customer question 
     Operand-->>BackEnd: Return Knowledge Graph on account activation
     BackEnd->>ChatGPT: Knowledge Graph + customer question
